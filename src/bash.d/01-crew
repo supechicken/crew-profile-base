@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
-# 01-crew: bash completion for crew command
+# 01-crew: post-install environment sync and bash completion for crew command
 
+function crew() {
+  CREW_ENV_SYNC=1 command crew "${@}"
+
+  if (( $? >= 128 )); then
+    # if exitcode >= 128, update environment and return the original exitcode
+    source "${CREW_PREFIX}/etc/profile"
+    return $(($? - 128))
+  else
+    # return exitcode
+    return $?
+  fi
+}
+
+# bash completion funcion
 function _crew () {
   local CREW_PACKAGES_PATH="${CREW_PREFIX}/lib/crew/packages/"
 
